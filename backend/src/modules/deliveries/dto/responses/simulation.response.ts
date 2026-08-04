@@ -5,7 +5,10 @@ export class SimulationResponse {
   @ApiProperty({ example: true, description: 'Se o relógio está avançando.' })
   running: boolean;
 
-  @ApiProperty({ example: 128.5, description: 'Minutos simulados desde o início.' })
+  @ApiProperty({
+    example: 128.5,
+    description: 'Minutos simulados desde o início.',
+  })
   clockMinutes: number;
 
   @ApiProperty({

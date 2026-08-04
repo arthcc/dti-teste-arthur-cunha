@@ -22,7 +22,7 @@ describe('API de entregas por drone (e2e)', () => {
     await app.init();
 
     await request(app.getHttpServer())
-      .post('/entregas/simulacao/pausar')
+      .post('/deliveries/simulation/pause')
       .expect(200);
   });
 
@@ -32,12 +32,12 @@ describe('API de entregas por drone (e2e)', () => {
 
   describe('drones', () => {
     it('cadastra um drone e o devolve na listagem', async () => {
-      const criado = await request(app.getHttpServer())
+      const created = await request(app.getHttpServer())
         .post('/drones')
         .send({ name: 'Drone E2E', capacityKg: 10, rangeKm: 40 })
         .expect(201);
 
-      expect(criado.body).toMatchObject({
+      expect(created.body).toMatchObject({
         name: 'Drone E2E',
         capacityKg: 10,
         rangeKm: 40,
@@ -45,12 +45,12 @@ describe('API de entregas por drone (e2e)', () => {
         batteryPercent: 100,
       });
 
-      const lista = await request(app.getHttpServer())
+      const list = await request(app.getHttpServer())
         .get('/drones')
         .expect(200);
 
-      expect(lista.body.map((d: { id: string }) => d.id)).toContain(
-        criado.body.id,
+      expect(list.body.map((d: { id: string }) => d.id)).toContain(
+        created.body.id,
       );
     });
 
@@ -77,14 +77,14 @@ describe('API de entregas por drone (e2e)', () => {
   describe('pedidos', () => {
     it('registra um pedido válido', async () => {
       const { body } = await request(app.getHttpServer())
-        .post('/pedidos')
-        .send({ location: { x: 5, y: 5 }, weightKg: 2, priority: 'alta' })
+        .post('/orders')
+        .send({ location: { x: 5, y: 5 }, weightKg: 2, priority: 'high' })
         .expect(201);
 
       expect(body).toMatchObject({
         location: { x: 5, y: 5 },
         weightKg: 2,
-        priority: 'alta',
+        priority: 'high',
         status: 'pending',
         assignedDroneId: null,
       });
@@ -92,22 +92,22 @@ describe('API de entregas por drone (e2e)', () => {
 
     it('recusa coordenadas fora da malha com 400', () => {
       return request(app.getHttpServer())
-        .post('/pedidos')
-        .send({ location: { x: -1, y: 999 }, weightKg: 2, priority: 'alta' })
+        .post('/orders')
+        .send({ location: { x: -1, y: 999 }, weightKg: 2, priority: 'high' })
         .expect(400);
     });
 
     it('recusa coordenadas fracionárias com 400', () => {
       return request(app.getHttpServer())
-        .post('/pedidos')
-        .send({ location: { x: 2.5, y: 3 }, weightKg: 2, priority: 'alta' })
+        .post('/orders')
+        .send({ location: { x: 2.5, y: 3 }, weightKg: 2, priority: 'high' })
         .expect(400);
     });
 
     it('recusa pacote acima da capacidade da frota com 422', async () => {
       const { body } = await request(app.getHttpServer())
-        .post('/pedidos')
-        .send({ location: { x: 5, y: 5 }, weightKg: 200, priority: 'baixa' })
+        .post('/orders')
+        .send({ location: { x: 5, y: 5 }, weightKg: 200, priority: 'low' })
         .expect(422);
 
       expect(body.message).toMatch(/excede a capacidade do maior drone/);
@@ -115,7 +115,7 @@ describe('API de entregas por drone (e2e)', () => {
 
     it('publica os limites vigentes', async () => {
       const { body } = await request(app.getHttpServer())
-        .get('/pedidos/limites')
+        .get('/orders/limits')
         .expect(200);
 
       expect(body).toMatchObject({
@@ -130,27 +130,27 @@ describe('API de entregas por drone (e2e)', () => {
   describe('zonas', () => {
     it('cria e remove uma zona de exclusão', async () => {
       const { body } = await request(app.getHttpServer())
-        .post('/zonas')
+        .post('/zones')
         .send({ name: 'Centro E2E', minX: 12, minY: 12, maxX: 14, maxY: 14 })
         .expect(201);
 
       expect(body).toMatchObject({ name: 'Centro E2E', blockedPoints: 9 });
 
       await request(app.getHttpServer())
-        .delete(`/zonas/${body.id}`)
+        .delete(`/zones/${body.id}`)
         .expect(204);
     });
 
     it('recusa zona que cobre a base com 422', () => {
       return request(app.getHttpServer())
-        .post('/zonas')
+        .post('/zones')
         .send({ minX: 0, minY: 0, maxX: 2, maxY: 2 })
         .expect(422);
     });
 
     it('recusa retângulo invertido com 400', () => {
       return request(app.getHttpServer())
-        .post('/zonas')
+        .post('/zones')
         .send({ minX: 8, minY: 1, maxX: 4, maxY: 4 })
         .expect(400);
     });
@@ -159,7 +159,7 @@ describe('API de entregas por drone (e2e)', () => {
   describe('entregas', () => {
     it('planeja a rota dos pedidos pendentes', async () => {
       const { body } = await request(app.getHttpServer())
-        .get('/entregas/rota')
+        .get('/deliveries/route')
         .expect(200);
 
       expect(body).toMatchObject({
@@ -177,26 +177,26 @@ describe('API de entregas por drone (e2e)', () => {
     });
 
     it('expõe e controla o relógio da simulação', async () => {
-      const pausada = await request(app.getHttpServer())
-        .get('/entregas/simulacao')
+      const paused = await request(app.getHttpServer())
+        .get('/deliveries/simulation')
         .expect(200);
 
-      expect(pausada.body.running).toBe(false);
+      expect(paused.body.running).toBe(false);
 
-      const retomada = await request(app.getHttpServer())
-        .post('/entregas/simulacao/retomar')
+      const resumed = await request(app.getHttpServer())
+        .post('/deliveries/simulation/resume')
         .expect(200);
 
-      expect(retomada.body.running).toBe(true);
+      expect(resumed.body.running).toBe(true);
 
       await request(app.getHttpServer())
-        .post('/entregas/simulacao/pausar')
+        .post('/deliveries/simulation/pause')
         .expect(200);
     });
 
     it('reinicia a simulação devolvendo a frota à base', async () => {
       const { body } = await request(app.getHttpServer())
-        .post('/entregas/simulacao/reiniciar')
+        .post('/deliveries/simulation/reset')
         .expect(200);
 
       expect(body).toMatchObject({

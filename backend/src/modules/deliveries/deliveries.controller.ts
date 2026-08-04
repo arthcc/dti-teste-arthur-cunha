@@ -5,15 +5,15 @@ import { SimulationResponse } from './dto/responses/simulation.response';
 import { DeliveriesService } from './deliveries.service';
 import { SimulationService } from './simulation.service';
 
-@ApiTags('entregas')
-@Controller('entregas')
+@ApiTags('deliveries')
+@Controller('deliveries')
 export class DeliveriesController {
   constructor(
     private readonly deliveriesService: DeliveriesService,
     private readonly simulationService: SimulationService,
   ) {}
 
-  @Get('rota')
+  @Get('route')
   @ApiOperation({
     summary:
       'Calcula o plano de entregas: aloca os pedidos pendentes nos drones disponíveis ' +
@@ -25,14 +25,14 @@ export class DeliveriesController {
     return RouteResponse.fromDomain(this.deliveriesService.plan());
   }
 
-  @Get('simulacao')
+  @Get('simulation')
   @ApiOperation({ summary: 'Estado atual do relógio da simulação.' })
   @ApiOkResponse({ type: SimulationResponse })
   simulation(): SimulationResponse {
     return SimulationResponse.fromDomain(this.simulationService.snapshot());
   }
 
-  @Post('simulacao/pausar')
+  @Post('simulation/pause')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Pausa o avanço do relógio da simulação.' })
   @ApiOkResponse({ type: SimulationResponse })
@@ -42,7 +42,7 @@ export class DeliveriesController {
     );
   }
 
-  @Post('simulacao/retomar')
+  @Post('simulation/resume')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retoma o avanço do relógio da simulação.' })
   @ApiOkResponse({ type: SimulationResponse })
@@ -52,7 +52,7 @@ export class DeliveriesController {
     );
   }
 
-  @Post('simulacao/reiniciar')
+  @Post('simulation/reset')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:

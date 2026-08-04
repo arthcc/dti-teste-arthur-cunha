@@ -1,11 +1,11 @@
 export enum Priority {
-  BAIXA = 'baixa',
-  MEDIA = 'media',
-  ALTA = 'alta',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
 }
 
 export const PRIORITY_WEIGHT: Record<Priority, number> = {
-  [Priority.ALTA]: 3,
-  [Priority.MEDIA]: 2,
-  [Priority.BAIXA]: 1,
+  [Priority.HIGH]: 3,
+  [Priority.MEDIUM]: 2,
+  [Priority.LOW]: 1,
 };

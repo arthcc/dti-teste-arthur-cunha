@@ -7,13 +7,16 @@ export class OrderResponse {
   @ApiProperty({ example: 'a1b2c3' })
   id: string;
 
-  @ApiProperty({ type: CoordinateResponse, description: 'Localização do cliente.' })
+  @ApiProperty({
+    type: CoordinateResponse,
+    description: 'Localização do cliente.',
+  })
   location: CoordinateResponse;
 
   @ApiProperty({ example: 3.5, description: 'Peso do pacote em kg.' })
   weightKg: number;
 
-  @ApiProperty({ enum: Priority, example: Priority.ALTA })
+  @ApiProperty({ enum: Priority, example: Priority.HIGH })
   priority: Priority;
 
   @ApiProperty({ enum: OrderStatus, example: OrderStatus.PENDING })

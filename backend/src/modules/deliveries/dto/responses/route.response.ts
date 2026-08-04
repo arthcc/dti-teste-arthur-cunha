@@ -8,7 +8,10 @@ export class RouteResponse {
   @ApiProperty({ example: 2, description: 'Quantidade de viagens planejadas.' })
   totalTrips: number;
 
-  @ApiProperty({ example: 5, description: 'Total de pedidos alocados em viagens.' })
+  @ApiProperty({
+    example: 5,
+    description: 'Total de pedidos alocados em viagens.',
+  })
   totalAssignedOrders: number;
 
   @ApiProperty({

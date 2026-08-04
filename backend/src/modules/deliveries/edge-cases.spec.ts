@@ -65,12 +65,12 @@ describe('edge case: pacote acima da capacidade', () => {
     }
 
     const plan = ctx.deliveries.plan();
-    const alocados = plan.trips.flatMap((t) => t.orders);
+    const assigned = plan.trips.flatMap((t) => t.orders);
 
     expect(plan.trips).toHaveLength(1);
     expect(plan.trips[0].totalWeightKg).toBeLessThanOrEqual(2.8);
     expect(plan.trips[0].occupancyPercent).toBeLessThanOrEqual(100);
-    expect(alocados.length + plan.unassigned.length).toBe(4);
+    expect(assigned.length + plan.unassigned.length).toBe(4);
   });
 
   it('deixa o excedente na fila em vez de estourar o único drone', () => {
@@ -276,7 +276,7 @@ describe('edge case: coordenadas inválidas', () => {
       ctx.orders.create({
         location: { x: 99, y: 99 },
         weightKg: 1,
-        priority: Priority.MEDIA,
+        priority: Priority.MEDIUM,
       }),
     ).toThrow(UnprocessableEntityException);
     expect(ctx.orders.findAll()).toEqual([]);

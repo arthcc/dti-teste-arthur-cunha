@@ -1,4 +1,8 @@
-import { BadRequestException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ZonesService } from './zones.service';
 
@@ -89,9 +93,7 @@ describe('ZonesService', () => {
     });
 
     it('expõe os retângulos sem os metadados', () => {
-      expect(service.rects()).toEqual([
-        { minX: 4, minY: 4, maxX: 8, maxY: 9 },
-      ]);
+      expect(service.rects()).toEqual([{ minX: 4, minY: 4, maxX: 8, maxY: 9 }]);
     });
   });
 

@@ -11,8 +11,8 @@ import { OrderLimitsResponse } from './dto/responses/order-limits.response';
 import { OrderResponse } from './dto/responses/order.response';
 import { OrdersService } from './orders.service';
 
-@ApiTags('pedidos')
-@Controller('pedidos')
+@ApiTags('orders')
+@Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -34,7 +34,7 @@ export class OrdersController {
     return this.ordersService.findAll().map(OrderResponse.fromDomain);
   }
 
-  @Get('limites')
+  @Get('limits')
   @ApiOperation({
     summary:
       'Limites vigentes (malha, capacidade e alcance da frota) para o front validar antes de enviar.',

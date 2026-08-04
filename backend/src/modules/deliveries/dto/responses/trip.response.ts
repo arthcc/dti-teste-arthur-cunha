@@ -7,7 +7,10 @@ export class TripResponse {
   @ApiProperty({ example: 'f1e2d3', description: 'ID da viagem planejada.' })
   id: string;
 
-  @ApiProperty({ example: 'a1b2c3', description: 'ID do drone que fará a viagem.' })
+  @ApiProperty({
+    example: 'a1b2c3',
+    description: 'ID do drone que fará a viagem.',
+  })
   droneId: string;
 
   @ApiProperty({ example: 'Drone Alpha' })
@@ -24,11 +27,15 @@ export class TripResponse {
 
   @ApiProperty({
     example: 4.6,
-    description: 'Quilômetros a mais causados pelos desvios das zonas de exclusão.',
+    description:
+      'Quilômetros a mais causados pelos desvios das zonas de exclusão.',
   })
   detourKm: number;
 
-  @ApiProperty({ example: 85, description: 'Ocupação da capacidade do drone (%).' })
+  @ApiProperty({
+    example: 85,
+    description: 'Ocupação da capacidade do drone (%).',
+  })
   occupancyPercent: number;
 
   @ApiProperty({
@@ -46,7 +53,10 @@ export class TripResponse {
   })
   serviceMinutes: number;
 
-  @ApiProperty({ example: 3, description: 'Tempo de carregamento na base (min).' })
+  @ApiProperty({
+    example: 3,
+    description: 'Tempo de carregamento na base (min).',
+  })
   loadingMinutes: number;
 
   @ApiProperty({

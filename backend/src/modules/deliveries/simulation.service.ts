@@ -65,7 +65,9 @@ export class SimulationService implements OnModuleInit, OnModuleDestroy {
   snapshot(): SimulationSnapshot {
     const orders = this.ordersService.findAll();
     const delivered = orders.filter((o) => o.deliveryMinutes !== null);
-    const inTransit = orders.filter((o) => o.assignedDroneId !== null && !o.deliveredAt);
+    const inTransit = orders.filter(
+      (o) => o.assignedDroneId !== null && !o.deliveredAt,
+    );
 
     return {
       running: this.running,
@@ -141,10 +143,12 @@ export class SimulationService implements OnModuleInit, OnModuleDestroy {
       }
 
       let cumulative = 0;
-      const stopDistances = shape.legs.slice(0, trip.route.length).map((leg) => {
-        cumulative += leg.distanceKm;
-        return cumulative;
-      });
+      const stopDistances = shape.legs
+        .slice(0, trip.route.length)
+        .map((leg) => {
+          cumulative += leg.distanceKm;
+          return cumulative;
+        });
 
       const flight: ActiveFlight = {
         tripId: trip.id,
@@ -227,7 +231,8 @@ export class SimulationService implements OnModuleInit, OnModuleDestroy {
 
     if (this.abortIfBatteryDead(flight)) return;
 
-    const nextStopIdx = flight.stopDistances.length - flight.pendingOrderIds.length;
+    const nextStopIdx =
+      flight.stopDistances.length - flight.pendingOrderIds.length;
     const nextStopAt = flight.stopDistances[nextStopIdx];
     if (
       flight.pendingOrderIds.length > 0 &&

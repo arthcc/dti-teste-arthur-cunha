@@ -4,7 +4,10 @@ import { Drone } from '../../interfaces/drone.interface';
 import { CoordinateResponse } from './coordinate.response';
 
 export class DroneResponse {
-  @ApiProperty({ example: 'a1b2c3', description: 'Identificador único do drone.' })
+  @ApiProperty({
+    example: 'a1b2c3',
+    description: 'Identificador único do drone.',
+  })
   id: string;
 
   @ApiProperty({ example: 'Drone Alpha' })
@@ -13,7 +16,10 @@ export class DroneResponse {
   @ApiProperty({ example: 10, description: 'Capacidade máxima em kg.' })
   capacityKg: number;
 
-  @ApiProperty({ example: 20, description: 'Autonomia com bateria cheia, em km.' })
+  @ApiProperty({
+    example: 20,
+    description: 'Autonomia com bateria cheia, em km.',
+  })
   rangeKm: number;
 
   @ApiProperty({ example: 40, description: 'Velocidade de cruzeiro em km/h.' })
@@ -26,7 +32,10 @@ export class DroneResponse {
   })
   state: DroneState;
 
-  @ApiProperty({ type: CoordinateResponse, description: 'Posição atual na malha.' })
+  @ApiProperty({
+    type: CoordinateResponse,
+    description: 'Posição atual na malha.',
+  })
   position: CoordinateResponse;
 
   @ApiProperty({ example: 87.5, description: 'Carga restante da bateria (%).' })

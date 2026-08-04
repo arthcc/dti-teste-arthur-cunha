@@ -61,19 +61,19 @@ export const api = {
   getDroneStatus: () => request<DroneStatus[]>('/drones/status'),
   createDrone: (input: CreateDroneInput) => post<Drone>('/drones', input),
 
-  getOrders: () => request<Order[]>('/pedidos'),
-  createOrder: (input: CreateOrderInput) => post<Order>('/pedidos', input),
-  getLimits: () => request<OrderLimits>('/pedidos/limites'),
+  getOrders: () => request<Order[]>('/orders'),
+  createOrder: (input: CreateOrderInput) => post<Order>('/orders', input),
+  getLimits: () => request<OrderLimits>('/orders/limits'),
 
-  getZones: () => request<NoFlyZone[]>('/zonas'),
-  createZone: (input: CreateZoneInput) => post<NoFlyZone>('/zonas', input),
+  getZones: () => request<NoFlyZone[]>('/zones'),
+  createZone: (input: CreateZoneInput) => post<NoFlyZone>('/zones', input),
   deleteZone: (id: string) =>
-    request<void>(`/zonas/${id}`, { method: 'DELETE' }),
+    request<void>(`/zones/${id}`, { method: 'DELETE' }),
 
-  getRoutePlan: () => request<RoutePlan>('/entregas/rota'),
+  getRoutePlan: () => request<RoutePlan>('/deliveries/route'),
 
-  getSimulation: () => request<SimulationState>('/entregas/simulacao'),
-  pauseSimulation: () => post<SimulationState>('/entregas/simulacao/pausar'),
-  resumeSimulation: () => post<SimulationState>('/entregas/simulacao/retomar'),
-  resetSimulation: () => post<SimulationState>('/entregas/simulacao/reiniciar'),
+  getSimulation: () => request<SimulationState>('/deliveries/simulation'),
+  pauseSimulation: () => post<SimulationState>('/deliveries/simulation/pause'),
+  resumeSimulation: () => post<SimulationState>('/deliveries/simulation/resume'),
+  resetSimulation: () => post<SimulationState>('/deliveries/simulation/reset'),
 };

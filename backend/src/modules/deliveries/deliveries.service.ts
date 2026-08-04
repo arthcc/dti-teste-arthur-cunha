@@ -17,7 +17,11 @@ import { Drone } from '../drones/interfaces/drone.interface';
 import { OrdersService } from '../orders/orders.service';
 import { Order } from '../orders/interfaces/order.interface';
 import { ZonesService } from '../zones/zones.service';
-import { AllocationPlan, Trip, UnassignedOrder } from './interfaces/trip.interface';
+import {
+  AllocationPlan,
+  Trip,
+  UnassignedOrder,
+} from './interfaces/trip.interface';
 
 @Injectable()
 export class DeliveriesService {
@@ -41,7 +45,9 @@ export class DeliveriesService {
 
     if (drones.length === 0) {
       const reason = this.noDroneReason();
-      this.logger.debug(`Nenhum drone despachável; ${pending.length} pedido(s) na espera`);
+      this.logger.debug(
+        `Nenhum drone despachável; ${pending.length} pedido(s) na espera`,
+      );
       return this.assemblePlan(
         [],
         pending.map((order) => ({ order, reason })),
@@ -64,7 +70,8 @@ export class DeliveriesService {
     }
 
     const sortedDrones = [...drones].sort(
-      (a, b) => b.capacityKg - a.capacityKg || b.batteryPercent - a.batteryPercent,
+      (a, b) =>
+        b.capacityKg - a.capacityKg || b.batteryPercent - a.batteryPercent,
     );
 
     const trips: Trip[] = [];
@@ -190,7 +197,11 @@ export class DeliveriesService {
     return null;
   }
 
-  private hasBatteryFor(drone: Drone, distanceKm: number, stops: number): boolean {
+  private hasBatteryFor(
+    drone: Drone,
+    distanceKm: number,
+    stops: number,
+  ): boolean {
     const cost = estimateFlight(distanceKm, stops, drone).batteryPercent;
     return drone.batteryPercent - cost >= BATTERY_RESERVE_PERCENT;
   }

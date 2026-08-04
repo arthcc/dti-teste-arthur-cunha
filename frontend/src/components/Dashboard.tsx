@@ -10,7 +10,7 @@ interface Props {
   simulation: SimulationState | null;
 }
 
-const PRIORITIES: Priority[] = ['alta', 'media', 'baixa'];
+const PRIORITIES: Priority[] = ['high', 'medium', 'low'];
 
 function avgOccupancyOf(plan: RoutePlan | null) {
   const trips = plan?.trips ?? [];

@@ -422,26 +422,26 @@
 .swatch--base {
   background: var(--ink);
 }
-.swatch--alta,
-.swatch--media,
-.swatch--baixa {
+.swatch--high,
+.swatch--medium,
+.swatch--low {
   border-radius: 50%;
 }
-.swatch--alta {
+.swatch--high {
   width: 10px;
   height: 10px;
-  background: var(--prio-alta);
+  background: var(--prio-high);
 }
-.swatch--media {
+.swatch--medium {
   width: 9px;
   height: 9px;
-  background: var(--prio-media);
+  background: var(--prio-medium);
 }
-.swatch--baixa {
+.swatch--low {
   width: 8px;
   height: 8px;
   background: var(--paper);
-  box-shadow: inset 0 0 0 1.5px var(--prio-baixa);
+  box-shadow: inset 0 0 0 1.5px var(--prio-low);
 }
 .swatch--done {
   width: 7px;

@@ -394,13 +394,13 @@ export function CityGrid({ drones, orders, plan, zones, selectedDroneId }: Props
             <i className="swatch swatch--drone" /> drone
           </li>
           <li>
-            <i className="swatch swatch--alta" /> alta
+            <i className="swatch swatch--high" /> alta
           </li>
           <li>
-            <i className="swatch swatch--media" /> média
+            <i className="swatch swatch--medium" /> média
           </li>
           <li>
-            <i className="swatch swatch--baixa" /> baixa
+            <i className="swatch swatch--low" /> baixa
           </li>
           <li>
             <i className="swatch swatch--done" /> entregue

@@ -17,9 +17,9 @@
   --alert: #c0271a;
   --alert-wash: #fbeeed;
 
-  --prio-alta: #b3241a;
-  --prio-media: #a8751f;
-  --prio-baixa: #6f7a80;
+  --prio-high: #b3241a;
+  --prio-medium: #a8751f;
+  --prio-low: #6f7a80;
 
   --font-ui: 'Instrument Sans', system-ui, -apple-system, sans-serif;
   --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;

@@ -130,8 +130,12 @@ describe('DronesService', () => {
     it('limita a carga no update', () => {
       const drone = service.create({ capacityKg: 10, rangeKm: 20 });
 
-      expect(service.update(drone.id, { batteryPercent: 130 }).batteryPercent).toBe(100);
-      expect(service.update(drone.id, { batteryPercent: -20 }).batteryPercent).toBe(0);
+      expect(
+        service.update(drone.id, { batteryPercent: 130 }).batteryPercent,
+      ).toBe(100);
+      expect(
+        service.update(drone.id, { batteryPercent: -20 }).batteryPercent,
+      ).toBe(0);
     });
   });
 

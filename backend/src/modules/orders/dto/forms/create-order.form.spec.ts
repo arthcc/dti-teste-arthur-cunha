@@ -6,7 +6,7 @@ import { CreateOrderForm } from './create-order.form';
 const VALID = {
   location: { x: 5, y: 8 },
   weightKg: 3.5,
-  priority: Priority.ALTA,
+  priority: Priority.HIGH,
 };
 
 const validate = (payload: Record<string, unknown>): string[] =>
@@ -57,8 +57,8 @@ describe('CreateOrderForm', () => {
     });
 
     it('exige a localização', () => {
-      const { location: _omitida, ...semLocation } = VALID;
-      expect(validate(semLocation)).toContain('location é obrigatório');
+      const { location: _location, ...withoutLocation } = VALID;
+      expect(validate(withoutLocation)).toContain('location é obrigatório');
     });
   });
 
@@ -93,13 +93,13 @@ describe('CreateOrderForm', () => {
     });
 
     it('recusa um valor fora do enum', () => {
-      expect(validate({ ...VALID, priority: 'urgentissima' })).toContain(
-        'priority deve ser baixa, media ou alta',
+      expect(validate({ ...VALID, priority: 'urgent' })).toContain(
+        'priority deve ser low, medium ou high',
       );
     });
   });
 
   it('recusa propriedades não declaradas', () => {
-    expect(validate({ ...VALID, apressado: true }).length).toBeGreaterThan(0);
+    expect(validate({ ...VALID, express: true }).length).toBeGreaterThan(0);
   });
 });

@@ -51,7 +51,7 @@ export function blocksBetween(a: Coordinate, b: Coordinate): number {
   return Math.round(Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)));
 }
 
-function quadras(n: number): string {
+function blocksLabel(n: number): string {
   return n === 1 ? '1 quadra' : `${n} quadras`;
 }
 
@@ -111,20 +111,20 @@ export function trackOrder(
     return {
       ...EMPTY,
       stage: blocks <= 2 ? 'arriving' : 'enroute',
-      message: `Seu pacote está a ${quadras(blocks)} de distância.`,
+      message: `Seu pacote está a ${blocksLabel(blocks)} de distância.`,
       blocksAway: blocks,
       droneId: drone.id,
       droneName: drone.name,
     };
   }
 
-  const recusa = plan?.unassigned.find((u) => u.order.id === order.id);
-  if (recusa) {
+  const rejection = plan?.unassigned.find((u) => u.order.id === order.id);
+  if (rejection) {
     return {
       ...EMPTY,
       stage: 'unassigned',
-      message: recusa.reason,
-      reason: recusa.reason,
+      message: rejection.reason,
+      reason: rejection.reason,
     };
   }
 

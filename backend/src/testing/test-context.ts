@@ -87,7 +87,7 @@ export function addOrder(ctx: DomainContext, spec: OrderSpec): Order {
   return ctx.orders.create({
     location: { x: spec.x, y: spec.y },
     weightKg: spec.weightKg ?? 1,
-    priority: spec.priority ?? Priority.MEDIA,
+    priority: spec.priority ?? Priority.MEDIUM,
   });
 }
 

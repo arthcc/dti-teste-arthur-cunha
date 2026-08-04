@@ -13,7 +13,7 @@ import {
 import { Order, OrderStatus } from '../orders/interfaces/order.interface';
 import { AllocationPlan } from './interfaces/trip.interface';
 
-const PRIORIDADES = [Priority.BAIXA, Priority.MEDIA, Priority.ALTA];
+const PRIORITIES = [Priority.LOW, Priority.MEDIUM, Priority.HIGH];
 
 function seedOrders(ctx: DomainContext, total: number, seed = 42): Order[] {
   const random = pseudoRandom(seed);
@@ -25,7 +25,7 @@ function seedOrders(ctx: DomainContext, total: number, seed = 42): Order[] {
         x: 1 + Math.floor(random() * 8),
         y: 1 + Math.floor(random() * 8),
         weightKg: 1 + Math.floor(random() * 4),
-        priority: PRIORIDADES[Math.floor(random() * 3)],
+        priority: PRIORITIES[Math.floor(random() * 3)],
       }),
     );
   }
@@ -72,18 +72,16 @@ function expectSingleAssignment(ctx: DomainContext): void {
 }
 
 function expectPlanIsSound(ctx: DomainContext, plan: AllocationPlan): void {
-  const alocados = plan.trips.flatMap((t) => t.orders.map((o) => o.id));
-  const recusados = plan.unassigned.map((u) => u.order.id);
+  const assigned = plan.trips.flatMap((t) => t.orders.map((o) => o.id));
+  const rejected = plan.unassigned.map((u) => u.order.id);
   const droneIds = plan.trips.map((t) => t.drone.id);
 
-  expect(new Set(alocados).size).toBe(alocados.length);
+  expect(new Set(assigned).size).toBe(assigned.length);
   expect(new Set(droneIds).size).toBe(droneIds.length);
-  expect(new Set([...alocados, ...recusados])).toEqual(
+  expect(new Set([...assigned, ...rejected])).toEqual(
     new Set(ctx.orders.findAll().map((o) => o.id)),
   );
-  expect(alocados.length + recusados.length).toBe(
-    ctx.orders.findAll().length,
-  );
+  expect(assigned.length + rejected.length).toBe(ctx.orders.findAll().length);
 
   for (const trip of plan.trips) {
     expect(trip.orders.length).toBeGreaterThan(0);
@@ -111,7 +109,7 @@ function inParallel(
           x: 1 + ((offset + i) % 9),
           y: 1 + ((offset + i * 3) % 9),
           weightKg: 1 + ((offset + i) % 4),
-          priority: PRIORIDADES[(offset + i) % 3],
+          priority: PRIORITIES[(offset + i) % 3],
         }),
       ),
     ),
@@ -132,15 +130,15 @@ describe('carga: planejamento com muitos pedidos simultâneos', () => {
     const orders = seedOrders(ctx, 60);
 
     const plan = ctx.deliveries.plan();
-    const alocados = plan.trips.flatMap((t) => t.orders.map((o) => o.id));
-    const recusados = plan.unassigned.map((u) => u.order.id);
+    const assigned = plan.trips.flatMap((t) => t.orders.map((o) => o.id));
+    const rejected = plan.unassigned.map((u) => u.order.id);
 
-    expect(new Set(alocados).size).toBe(alocados.length);
-    expect(new Set(recusados).size).toBe(recusados.length);
-    expect(new Set([...alocados, ...recusados])).toEqual(
+    expect(new Set(assigned).size).toBe(assigned.length);
+    expect(new Set(rejected).size).toBe(rejected.length);
+    expect(new Set([...assigned, ...rejected])).toEqual(
       new Set(orders.map((o) => o.id)),
     );
-    expect(alocados.length + recusados.length).toBe(orders.length);
+    expect(assigned.length + rejected.length).toBe(orders.length);
   });
 
   it('respeita capacidade, autonomia e reserva de bateria em todas as viagens', () => {
@@ -207,7 +205,7 @@ describe('carga: planejamento com muitos pedidos simultâneos', () => {
         x: 1 + (i % 5),
         y: 2,
         weightKg: 5,
-        priority: Priority.BAIXA,
+        priority: Priority.LOW,
       });
     }
     for (let i = 0; i < 10; i += 1) {
@@ -215,19 +213,19 @@ describe('carga: planejamento com muitos pedidos simultâneos', () => {
         x: 1 + (i % 5),
         y: 4,
         weightKg: 5,
-        priority: Priority.ALTA,
+        priority: Priority.HIGH,
       });
     }
 
     const plan = ctx.deliveries.plan();
-    const alocados = plan.trips.flatMap((t) => t.orders);
+    const assigned = plan.trips.flatMap((t) => t.orders);
 
-    expect(alocados).toHaveLength(12);
+    expect(assigned).toHaveLength(12);
+    expect(assigned.filter((o) => o.priority === Priority.HIGH)).toHaveLength(
+      10,
+    );
     expect(
-      alocados.filter((o) => o.priority === Priority.ALTA),
-    ).toHaveLength(10);
-    expect(
-      plan.unassigned.filter((u) => u.order.priority === Priority.ALTA),
+      plan.unassigned.filter((u) => u.order.priority === Priority.HIGH),
     ).toEqual([]);
   });
 
@@ -280,7 +278,11 @@ describe('carga: simulação com pedidos chegando ao longo do tempo', () => {
     const todos: Order[] = [];
     for (let leva = 0; leva < 3; leva += 1) {
       todos.push(...seedOrders(ctx, 5, 11 + leva));
-      runUntil(() => false, 25, () => expectFleetInvariants(ctx));
+      runUntil(
+        () => false,
+        25,
+        () => expectFleetInvariants(ctx),
+      );
     }
 
     const ticks = runUntil(filaVazia(ctx, todos.length), 3000, () =>
@@ -328,10 +330,10 @@ describe('carga: múltiplos pedidos simultâneos', () => {
   });
 
   it('registra 120 pedidos criados em paralelo sem colisão de id', async () => {
-    const criados = await inParallel(ctx, 120);
+    const created = await inParallel(ctx, 120);
 
-    expect(criados).toHaveLength(120);
-    expect(new Set(criados.map((o) => o.id)).size).toBe(120);
+    expect(created).toHaveLength(120);
+    expect(new Set(created.map((o) => o.id)).size).toBe(120);
     expect(ctx.orders.findAll()).toHaveLength(120);
     expect(ctx.orders.findPending()).toHaveLength(120);
   });
@@ -351,9 +353,7 @@ describe('carga: múltiplos pedidos simultâneos', () => {
     const planoFinal = ctx.deliveries.plan();
 
     expectPlanIsSound(ctx, planoFinal);
-    expect(ctx.orders.findAll()).toHaveLength(
-      primeira.length + segunda.length,
-    );
+    expect(ctx.orders.findAll()).toHaveLength(primeira.length + segunda.length);
   });
 
   it('planeja 200 pedidos com 12 drones sem quebrar nenhuma restrição', () => {

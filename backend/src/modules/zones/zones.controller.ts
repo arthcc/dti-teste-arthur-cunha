@@ -19,8 +19,8 @@ import { CreateZoneForm } from './dto/forms/create-zone.form';
 import { ZoneResponse } from './dto/responses/zone.response';
 import { ZonesService } from './zones.service';
 
-@ApiTags('zonas')
-@Controller('zonas')
+@ApiTags('zones')
+@Controller('zones')
 export class ZonesController {
   constructor(private readonly zonesService: ZonesService) {}
 

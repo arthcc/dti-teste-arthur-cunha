@@ -18,14 +18,14 @@ interface Errors {
   form?: string;
 }
 
-const PRIORITIES: Priority[] = ['alta', 'media', 'baixa'];
+const PRIORITIES: Priority[] = ['high', 'medium', 'low'];
 
 export function OrderForm({ limits, zones, onCreated }: Props) {
   const toast = useToast();
   const [x, setX] = useState('');
   const [y, setY] = useState('');
   const [weight, setWeight] = useState('');
-  const [priority, setPriority] = useState<Priority>('alta');
+  const [priority, setPriority] = useState<Priority>('high');
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,7 +95,7 @@ export function OrderForm({ limits, zones, onCreated }: Props) {
       setX('');
       setY('');
       setWeight('');
-      setPriority('alta');
+      setPriority('high');
       setErrors({});
       onCreated();
     } catch (err) {

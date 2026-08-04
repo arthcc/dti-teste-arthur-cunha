@@ -14,7 +14,10 @@ import { LocationForm } from './location.form';
 const MAX_WEIGHT_KG = 500;
 
 export class CreateOrderForm {
-  @ApiProperty({ type: LocationForm, description: 'Localização do cliente (X, Y).' })
+  @ApiProperty({
+    type: LocationForm,
+    description: 'Localização do cliente (X, Y).',
+  })
   @IsDefined({ message: 'location é obrigatório' })
   @ValidateNested()
   @Type(() => LocationForm)
@@ -33,9 +36,9 @@ export class CreateOrderForm {
 
   @ApiProperty({
     enum: Priority,
-    example: Priority.ALTA,
+    example: Priority.HIGH,
     description: 'Prioridade da entrega.',
   })
-  @IsEnum(Priority, { message: 'priority deve ser baixa, media ou alta' })
+  @IsEnum(Priority, { message: 'priority deve ser low, medium ou high' })
   priority: Priority;
 }

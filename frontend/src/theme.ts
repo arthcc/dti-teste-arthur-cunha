@@ -18,19 +18,19 @@ export const C = {
 } as const;
 
 export const PRIORITY_HEX: Record<Priority, string> = {
-  alta: '#b3241a',
-  media: '#a8751f',
-  baixa: '#6f7a80',
+  high: '#b3241a',
+  medium: '#a8751f',
+  low: '#6f7a80',
 };
 
 export const PRIORITY_MARK: Record<Priority, { r: number; hollow: boolean }> = {
-  alta: { r: 5, hollow: false },
-  media: { r: 4.2, hollow: false },
-  baixa: { r: 3.6, hollow: true },
+  high: { r: 5, hollow: false },
+  medium: { r: 4.2, hollow: false },
+  low: { r: 3.6, hollow: true },
 };
 
 export const PRIORITY_BAR_FILL: Record<Priority, string> = {
-  alta: '#b3241a',
-  media: '#a8751f',
-  baixa: '#dde2e4',
+  high: '#b3241a',
+  medium: '#a8751f',
+  low: '#dde2e4',
 };

@@ -1,4 +1,4 @@
-export type Priority = 'baixa' | 'media' | 'alta';
+export type Priority = 'low' | 'medium' | 'high';
 
 export type DroneState =
   | 'idle'

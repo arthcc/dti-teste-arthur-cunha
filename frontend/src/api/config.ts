@@ -5,21 +5,21 @@ export const GRID_SIZE = 20;
 export const POLL_INTERVAL_MS = 1500;
 
 export const PRIORITY_LABEL: Record<Priority, string> = {
-  alta: 'Alta',
-  media: 'Média',
-  baixa: 'Baixa',
+  high: 'Alta',
+  medium: 'Média',
+  low: 'Baixa',
 };
 
 export const PRIORITY_COLOR: Record<Priority, string> = {
-  alta: 'var(--prio-alta)',
-  media: 'var(--prio-media)',
-  baixa: 'var(--prio-baixa)',
+  high: 'var(--prio-high)',
+  medium: 'var(--prio-medium)',
+  low: 'var(--prio-low)',
 };
 
 export const PRIORITY_RANK: Record<Priority, number> = {
-  alta: 3,
-  media: 2,
-  baixa: 1,
+  high: 3,
+  medium: 2,
+  low: 1,
 };
 
 export const DRONE_STATE_LABEL: Record<DroneState, string> = {

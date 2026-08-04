@@ -57,9 +57,7 @@ describe('SimulationService', () => {
       advanceTicks(50);
 
       expect(pausado.running).toBe(false);
-      expect(ctx.simulation.snapshot().clockMinutes).toBe(
-        pausado.clockMinutes,
-      );
+      expect(ctx.simulation.snapshot().clockMinutes).toBe(pausado.clockMinutes);
     });
 
     it('volta a avançar quando retomada', () => {
@@ -122,10 +120,7 @@ describe('SimulationService', () => {
       expect(order.status).toBe(OrderStatus.ALLOCATED);
       expect(ctx.simulation.snapshot().activeFlights).toBe(1);
 
-      const ticks = runUntil(
-        () => order.status === OrderStatus.DELIVERED,
-        400,
-      );
+      const ticks = runUntil(() => order.status === OrderStatus.DELIVERED, 400);
 
       expect(ticks).toBeLessThan(400);
       expect(order.deliveryMinutes).toBeGreaterThan(0);

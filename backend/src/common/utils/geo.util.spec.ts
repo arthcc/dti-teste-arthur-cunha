@@ -168,9 +168,9 @@ describe('geo.util', () => {
 
     it('cobra o desvio quando há zona no caminho', () => {
       const direct = distance({ x: 0, y: 0 }, { x: 4, y: 0 });
-      expect(travelDistance({ x: 0, y: 0 }, { x: 4, y: 0 }, [WALL])).toBeGreaterThan(
-        direct,
-      );
+      expect(
+        travelDistance({ x: 0, y: 0 }, { x: 4, y: 0 }, [WALL]),
+      ).toBeGreaterThan(direct);
     });
 
     it('é infinita quando não há rota', () => {

@@ -71,7 +71,7 @@ A documentação interativa (Swagger UI) fica em **`http://localhost:3000/docs`*
 **Logs.** Por padrão saem apenas `error`, `warn` e `log`, e o `log` registra só os
 eventos que mudam estado (viagem despachada, concluída, abortada por bateria) — o
 planejamento em si é uma consulta pura, chamada a cada tick e a cada `GET
-/entregas/rota`, então não polui o console. Para ver o raciocínio do planejador
+/deliveries/route`, então não polui o console. Para ver o raciocínio do planejador
 passo a passo:
 
 ```bash
@@ -101,20 +101,20 @@ curl -X POST http://localhost:3000/drones \
   -d '{"name":"Falcão","capacityKg":10,"rangeKm":60,"speedKmh":40}'
 
 # 2. registrar um pedido
-curl -X POST http://localhost:3000/pedidos \
+curl -X POST http://localhost:3000/orders \
   -H 'Content-Type: application/json' \
-  -d '{"location":{"x":5,"y":8},"weightKg":3.5,"priority":"alta"}'
+  -d '{"location":{"x":5,"y":8},"weightKg":3.5,"priority":"high"}'
 
 # 3. (opcional) criar uma zona de exclusão aérea
-curl -X POST http://localhost:3000/zonas \
+curl -X POST http://localhost:3000/zones \
   -H 'Content-Type: application/json' \
   -d '{"name":"Centro","minX":3,"minY":3,"maxX":6,"maxY":6}'
 
 # 4. ver o plano de entregas
-curl http://localhost:3000/entregas/rota
+curl http://localhost:3000/deliveries/route
 
 # 5. acompanhar o relógio da simulação
-curl http://localhost:3000/entregas/simulacao
+curl http://localhost:3000/deliveries/simulation
 ```
 
 ---
@@ -163,13 +163,13 @@ Cada módulo segue o mesmo desenho:
 ### Fluxo de uma entrega
 
 ```
-POST /pedidos ──► OrdersService.create
+POST /orders ──► OrdersService.create
                    ├─ valida destino fora de zona de exclusão
                    ├─ valida peso ≤ maior capacidade da frota
                    └─ valida ida e volta ≤ alcance útil da frota
                         │
                         ▼
-              DeliveriesService.plan()  (a cada tick, e sob demanda em GET /entregas/rota)
+              DeliveriesService.plan()  (a cada tick, e sob demanda em GET /deliveries/route)
                    ├─ ordena a fila por prioridade e depois por chegada
                    ├─ descarta os inviáveis com motivo textual
                    ├─ percorre os drones do maior para o menor
@@ -201,7 +201,7 @@ O planejador é uma **heurística gulosa em dois níveis**:
 **Por que guloso e não a solução ótima.** Bin packing e TSP são NP-difíceis; para a
 frota e a fila desta simulação o ganho de um solver exato seria marginal e o custo,
 imprevisível. O planejador roda **a cada tick (1 s) e também sob demanda** em
-`GET /entregas/rota`, então tempo de resposta limitado e determinismo valem mais que
+`GET /deliveries/route`, então tempo de resposta limitado e determinismo valem mais que
 otimalidade: a mesma fila sempre produz o mesmo plano (coberto por teste), e todo
 pedido que sobra sai com **motivo textual** — uma busca exata daria um número melhor
 sem conseguir explicar a recusa ao operador.
@@ -238,7 +238,7 @@ O passo natural de evolução é **orientar a simulação a eventos dentro do pr
 `order.created`, `trip.dispatched`, `order.delivered` via `EventEmitter2` do Nest.
 Isso desacopla o `SimulationService` de `OrdersService`/`DronesService`, que hoje ele
 chama direto, e dá o gancho pronto para empurrar atualizações ao front por WebSocket
-em vez de o front ficar consultando `GET /entregas/rota` em laço.
+em vez de o front ficar consultando `GET /deliveries/route` em laço.
 
 **Broker de mensageria (Kafka, RabbitMQ) não entra aqui.** Ele resolve durabilidade
 entre processos, múltiplos consumidores, replay e backpressure entre serviços —
@@ -276,7 +276,7 @@ parte dela e volta para ela.
 | --- | --- |
 | `location` | Destino `(x, y)`, inteiros dentro da malha |
 | `weightKg` | Peso do pacote (até 3 casas decimais) |
-| `priority` | `baixa`, `media` ou `alta` |
+| `priority` | `low`, `medium` ou `high` |
 | `status` | `pending` → `allocated` → `in_transit` → `delivered` |
 | `deliveryMinutes` | Minutos de simulação até a entrega |
 
@@ -370,15 +370,15 @@ Base: `http://localhost:3000` · Documentação completa: `/docs`
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| `POST` | `/pedidos` | Registra um pedido de entrega |
-| `GET` | `/pedidos` | Lista todos os pedidos |
-| `GET` | `/pedidos/limites` | Limites vigentes, para o front validar antes de enviar |
+| `POST` | `/orders` | Registra um pedido de entrega |
+| `GET` | `/orders` | Lista todos os pedidos |
+| `GET` | `/orders/limits` | Limites vigentes, para o front validar antes de enviar |
 
 <details>
-<summary><code>POST /pedidos</code></summary>
+<summary><code>POST /orders</code></summary>
 
 ```json
-{ "location": { "x": 5, "y": 8 }, "weightKg": 3.5, "priority": "alta" }
+{ "location": { "x": 5, "y": 8 }, "weightKg": 3.5, "priority": "high" }
 ```
 
 - `400` — coordenada fora de `0..20`, fracionária ou não numérica; peso ≤ 0 ou com
@@ -390,12 +390,12 @@ Base: `http://localhost:3000` · Documentação completa: `/docs`
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| `POST` | `/zonas` | Cria uma zona; as rotas passam a desviar dela |
-| `GET` | `/zonas` | Lista as zonas ativas |
-| `DELETE` | `/zonas/:id` | Remove uma zona (`204`) |
+| `POST` | `/zones` | Cria uma zona; as rotas passam a desviar dela |
+| `GET` | `/zones` | Lista as zonas ativas |
+| `DELETE` | `/zones/:id` | Remove uma zona (`204`) |
 
 <details>
-<summary><code>POST /zonas</code></summary>
+<summary><code>POST /zones</code></summary>
 
 ```json
 { "name": "Centro", "minX": 3, "minY": 3, "maxX": 6, "maxY": 6 }
@@ -409,14 +409,14 @@ Base: `http://localhost:3000` · Documentação completa: `/docs`
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| `GET` | `/entregas/rota` | Plano de alocação: viagens, rotas, custos e recusas com motivo |
-| `GET` | `/entregas/simulacao` | Estado do relógio da simulação |
-| `POST` | `/entregas/simulacao/pausar` | Congela o relógio |
-| `POST` | `/entregas/simulacao/retomar` | Retoma o relógio |
-| `POST` | `/entregas/simulacao/reiniciar` | Frota à base com bateria cheia, pedidos de volta à fila |
+| `GET` | `/deliveries/route` | Plano de alocação: viagens, rotas, custos e recusas com motivo |
+| `GET` | `/deliveries/simulation` | Estado do relógio da simulação |
+| `POST` | `/deliveries/simulation/pause` | Congela o relógio |
+| `POST` | `/deliveries/simulation/resume` | Retoma o relógio |
+| `POST` | `/deliveries/simulation/reset` | Frota à base com bateria cheia, pedidos de volta à fila |
 
 <details>
-<summary><code>GET /entregas/rota</code> — formato da resposta</summary>
+<summary><code>GET /deliveries/route</code> — formato da resposta</summary>
 
 ```jsonc
 {

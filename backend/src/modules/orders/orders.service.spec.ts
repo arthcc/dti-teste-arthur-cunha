@@ -1,4 +1,7 @@
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import {
   BATTERY_RESERVE_PERCENT,
   GRID_SIZE,
@@ -29,13 +32,13 @@ describe('OrdersService', () => {
         x: 5,
         y: 8,
         weightKg: 3.5,
-        priority: Priority.ALTA,
+        priority: Priority.HIGH,
       });
 
       expect(order).toMatchObject({
         location: { x: 5, y: 8 },
         weightKg: 3.5,
-        priority: Priority.ALTA,
+        priority: Priority.HIGH,
         status: OrderStatus.PENDING,
         assignedDroneId: null,
         deliveredAt: null,
@@ -99,9 +102,9 @@ describe('OrdersService', () => {
     it('recusa destino além do alcance útil da frota', () => {
       addDrone(ctx, { capacityKg: 10, rangeKm: 10 });
 
-      expect(() =>
-        addOrder(ctx, { x: GRID_SIZE, y: GRID_SIZE }),
-      ).toThrow(UnprocessableEntityException);
+      expect(() => addOrder(ctx, { x: GRID_SIZE, y: GRID_SIZE })).toThrow(
+        UnprocessableEntityException,
+      );
     });
 
     it('desconta a reserva de bateria do alcance anunciado', () => {
@@ -116,9 +119,7 @@ describe('OrdersService', () => {
     });
 
     it('não aplica limite de alcance com a frota vazia', () => {
-      expect(() =>
-        addOrder(ctx, { x: GRID_SIZE, y: GRID_SIZE }),
-      ).not.toThrow();
+      expect(() => addOrder(ctx, { x: GRID_SIZE, y: GRID_SIZE })).not.toThrow();
     });
 
     it('rejeita destino cercado mesmo sem frota', () => {

@@ -181,7 +181,9 @@ describe('DeliveriesService.plan', () => {
         speedKmh: 40,
       });
       addOrder(ctx, { x: 5, y: 0, weightKg: 1 });
-      ctx.drones.update(drone.id, { batteryPercent: 52 + BATTERY_RESERVE_PERCENT });
+      ctx.drones.update(drone.id, {
+        batteryPercent: 52 + BATTERY_RESERVE_PERCENT,
+      });
 
       const plan = ctx.deliveries.plan();
 
@@ -282,13 +284,13 @@ describe('DeliveriesService.plan', () => {
   describe('ordenação da fila', () => {
     it('atende a prioridade alta antes da baixa', () => {
       addDrone(ctx, { capacityKg: 5, rangeKm: 40 });
-      addOrder(ctx, { x: 2, y: 0, weightKg: 5, priority: Priority.BAIXA });
-      addOrder(ctx, { x: 3, y: 0, weightKg: 5, priority: Priority.ALTA });
+      addOrder(ctx, { x: 2, y: 0, weightKg: 5, priority: Priority.LOW });
+      addOrder(ctx, { x: 3, y: 0, weightKg: 5, priority: Priority.HIGH });
 
       const trip = ctx.deliveries.plan().trips[0];
 
       expect(trip.orders).toHaveLength(1);
-      expect(trip.orders[0].priority).toBe(Priority.ALTA);
+      expect(trip.orders[0].priority).toBe(Priority.HIGH);
     });
 
     it('respeita a ordem de chegada dentro da mesma prioridade', () => {
@@ -297,9 +299,9 @@ describe('DeliveriesService.plan', () => {
         x: 8,
         y: 0,
         weightKg: 5,
-        priority: Priority.MEDIA,
+        priority: Priority.MEDIUM,
       });
-      addOrder(ctx, { x: 2, y: 0, weightKg: 5, priority: Priority.MEDIA });
+      addOrder(ctx, { x: 2, y: 0, weightKg: 5, priority: Priority.MEDIUM });
 
       const trip = ctx.deliveries.plan().trips[0];
 
@@ -326,7 +328,8 @@ describe('DeliveriesService.plan', () => {
     it('dá no máximo uma viagem por drone em cada plano', () => {
       addDrone(ctx, { capacityKg: 5, rangeKm: 60 });
       addDrone(ctx, { capacityKg: 5, rangeKm: 60 });
-      for (let i = 1; i <= 6; i += 1) addOrder(ctx, { x: i, y: 0, weightKg: 5 });
+      for (let i = 1; i <= 6; i += 1)
+        addOrder(ctx, { x: i, y: 0, weightKg: 5 });
 
       const plan = ctx.deliveries.plan();
 
