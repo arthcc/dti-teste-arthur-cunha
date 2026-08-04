@@ -74,13 +74,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: flyctl deploy
-        run: flyctl deploy ./backend --config backend/fly.toml --remote-only
+        working-directory: backend
+        run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   deploy-web:
     name: Deploy Web (Fly.io)
-    # A API sobe primeiro: o front recém-publicado já encontra o backend novo.
     needs: [deploy-api]
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -90,10 +90,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      # VITE_API_URL entra como build-arg (está fixo em frontend/fly.toml);
-      # o Vite congela a URL no bundle na hora do build.
       - name: flyctl deploy
-        run: flyctl deploy ./frontend --config frontend/fly.toml --remote-only
+        working-directory: frontend
+        run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
