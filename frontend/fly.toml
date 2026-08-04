@@ -1,0 +1,19 @@
+app = 'teste-dti-arthur-web'
+primary_region = 'gru'
+
+[build]
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_start_machines = true
+
+  # nginx estático — poderia dormir, mas mantemos 1 no ar para a demo
+  # responder instantaneamente.
+  auto_stop_machines = false
+  min_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'

@@ -23,7 +23,8 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  await app.listen(3000);
-  Logger.log('API rodando em http://localhost:3000 (Swagger em /docs)', 'Bootstrap');
+  const port = Number(process.env.PORT ?? 3000);
+  await app.listen(port, '0.0.0.0');
+  Logger.log(`API rodando na porta ${port} (Swagger em /docs)`, 'Bootstrap');
 }
 bootstrap();
