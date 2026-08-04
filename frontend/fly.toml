@@ -2,6 +2,10 @@ app = 'teste-dti-arthur-web'
 primary_region = 'gru'
 
 [build]
+  # O Vite congela a URL da API no bundle durante o build — por isso ela vem
+  # como build-arg (e não como env de runtime).
+  [build.args]
+    VITE_API_URL = 'https://teste-dti-arthur-api.fly.dev'
 
 [http_service]
   internal_port = 8080

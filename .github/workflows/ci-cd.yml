@@ -1,0 +1,109 @@
+name: CI/CD
+
+# Todo push na main passa pelos testes e, se verde, vai para o Fly.io.
+# workflow_dispatch permite publicar o estado atual da main sob demanda —
+# útil para os commits que entraram antes deste workflow existir.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Um deploy por vez: dois pushes seguidos não disputam a mesma máquina.
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  API_URL: https://teste-dti-arthur-api.fly.dev
+  WEB_URL: https://teste-dti-arthur-web.fly.dev
+
+jobs:
+  api:
+    name: API — lint, test, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint:ci
+      - run: npm run test -- --ci
+      - run: npm run test:e2e -- --ci
+      - run: npm run build
+
+  web:
+    name: Web — lint, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+        env:
+          VITE_API_URL: ${{ env.API_URL }}
+
+  deploy-api:
+    name: Deploy API (Fly.io)
+    needs: [api, web]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: production-api
+      url: https://teste-dti-arthur-api.fly.dev/docs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: flyctl deploy
+        run: flyctl deploy ./backend --config backend/fly.toml --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-web:
+    name: Deploy Web (Fly.io)
+    # A API sobe primeiro: o front recém-publicado já encontra o backend novo.
+    needs: [deploy-api]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: production-web
+      url: https://teste-dti-arthur-web.fly.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      # VITE_API_URL entra como build-arg (está fixo em frontend/fly.toml);
+      # o Vite congela a URL no bundle na hora do build.
+      - name: flyctl deploy
+        run: flyctl deploy ./frontend --config frontend/fly.toml --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  smoke:
+    name: Smoke test
+    needs: [deploy-api, deploy-web]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: API responde
+        run: curl --fail --silent --show-error --retry 5 --retry-all-errors "$API_URL/drones"
+      - name: Front responde
+        run: curl --fail --silent --show-error --retry 5 --retry-all-errors "$WEB_URL" > /dev/null
