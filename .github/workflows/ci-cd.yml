@@ -1,8 +1,6 @@
 name: CI/CD
 
-# Todo push na main passa pelos testes e, se verde, vai para o Fly.io.
-# workflow_dispatch permite publicar o estado atual da main sob demanda —
-# útil para os commits que entraram antes deste workflow existir.
+
 on:
   push:
     branches: [main]
@@ -10,7 +8,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Um deploy por vez: dois pushes seguidos não disputam a mesma máquina.
+
 concurrency:
   group: ci-cd-${{ github.ref }}
   cancel-in-progress: false
@@ -35,11 +33,16 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      - run: npm ci
-      - run: npm run lint:ci
-      - run: npm run test -- --ci
-      - run: npm run test:e2e -- --ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint:ci
+      - name: Unit tests
+        run: npm run test -- --ci
+      - name: E2E tests
+        run: npm run test:e2e -- --ci
+      - name: Build
+        run: npm run build
 
   web:
     name: Web — lint, build
